@@ -1,140 +1,85 @@
 #include "shell.h"
 
 /**
- * _erratois - converts a string to an integer
- * @s: the string to be converted
- * Return: 0 if no numbers in string, converted number otherwise
- *       -1 on error
- */
-int _erratois(char *s)
-{
-	int i = 0;
-	unsigned long int result = 0;
-
-	if (*s == '+')
-		s++;  /* TODO: why does this make main return 255? */
-	for (i = 0;  s[i] != '\0'; i++)
-	{
-		if (s[i] >= '0' && s[i] <= '9')
-		{
-			result *= 10;
-			result += (s[i] - '0');
-			if (result > INT_MAX)
-				return (-1);
-		}
-		else
-			return (-1);
-	}
-	return (result);
-}
-
-/**
- * print_errors - prints an error message
- * @info: the parameter & return info struct
- * @estr: string containing specified error type
- * Return: 0 if no numbers in string, converted number otherwise
- *        -1 on error
- */
-void print_errors(info_t *info, char *estr)
-{
-	_eputs(info->fname);
-	_eputs(": ");
-	print_d(info->line_count, STDERR_FILENO);
-	_eputs(": ");
-	_eputs(info->argv[0]);
-	_eputs(": ");
-	_eputs(estr);
-}
-
-/**
- * prints_d - function prints a decimal (integer) number (base 10)
- * @input: the input
- * @fd: the filedescriptor to write to
+ * _eputs - Prints an input string
+ * @str: The string to be printed
  *
- * Return: number of characters printed
+ * Return: Nothing
  */
-int prints_d(int input, int fd)
+void _eputs(char *str)
 {
-	int (*__putchar)(char) = _putchar;
-	int i, count = 0;
-	unsigned int _abs_, current;
+int i = 0;
 
-	if (fd == STDERR_FILENO)
-		__putchar = _eputchar;
-	if (input < 0)
-	{
-		_abs_ = -input;
-		__putchar('-');
-		count++;
-	}
-	else
-		_abs_ = input;
-	current = _abs_;
-	for (i = 1000000000; i > 1; i /= 10)
-	{
-		if (_abs_ / i)
-		{
-			__putchar('0' + current / i);
-			count++;
-		}
-		current %= i;
-	}
-	__putchar('0' + current);
-	count++;
-
-	return (count);
+if (!str)
+return;
+while (str[i] != '\0')
+{
+_eputchar(str[i]);
+i++;
+}
 }
 
 /**
- * convert_numbers - converter function, a clone of itoa
- * @num: number
- * @base: base
- * @flags: argument flags
+ * _eputchar - Writes the character c to stderr
+ * @c: The character to print
  *
- * Return: string
+ * Return: On success 1.
+ *         On error, -1 is returned, and errno is set appropriately.
  */
-char *convert_numbers(long int num, int base, int flags)
+int _eputchar(char c)
 {
-	static char *array;
-	static char buffer[50];
-	char sign = 0;
-	char *ptr;
-	unsigned long n = num;
+static int i;
+static char buf[WRITE_BUF_SIZE];
 
-	if (!(flags & CONVERT_UNSIGNED) && num < 0)
-	{
-		n = -num;
-		sign = '-';
-
-	}
-	array = flags & CONVERT_LOWERCASE ? "0123456789abcdef" : "0123456789ABCDEF";
-	ptr = &buffer[49];
-	*ptr = '\0';
-
-	do	{
-		*--ptr = array[n % base];
-		n /= base;
-	} while (n != 0);
-
-	if (sign)
-		*--ptr = sign;
-	return (ptr);
+if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+{
+write(2, buf, i);
+i = 0;
+}
+if (c != BUF_FLUSH)
+buf[i++] = c;
+(return 1);
 }
 
 /**
- * removes_comments - function replaces first instance of '#' with '\0'
- * @buf: address of the string to modify
+ * _putfd - Writes the character c to the given fd
+ * @c: The character to print
+ * @fd: The file descriptor to write to
  *
- * Return: Always 0;
+ * Return: On success 1.
+ *         On error, -1 is returned, and errno is set appropriately.
  */
-void removes_comments(char *buf)
+int _putfd(char c, int fd)
 {
-	int i;
+static int i;
+static char buf[WRITE_BUF_SIZE];
 
-	for (i = 0; buf[i] != '\0'; i++)
-		if (buf[i] == '#' && (!i || buf[i - 1] == ' '))
-		{
-			buf[i] = '\0';
-			break;
-		}
+if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+{
+write(fd, buf, i);
+i = 0;
+}
+if (c != BUF_FLUSH)
+buf[i++] = c;
+(return 1);
+}
+
+/**
+ * _putsfd - Prints an input string
+ * @str: The string to be printed
+ * @fd: The file descriptor to write to
+ *
+ * Return: The number of characters put
+ */
+int _putsfd(char *str, int fd)
+{
+int i = 0;
+
+if (!str)
+(return 0);
+while (*str)
+{
+i += _putfd(*str++, fd);
+}
+(return i);
 }
