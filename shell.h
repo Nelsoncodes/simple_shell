@@ -182,9 +182,25 @@ typedef struct passinfo
 
 #define INFO_INIT \
 
-{NULL, NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, \
-
-		0, 0, 0}
+{ .arg = NULL, \
+.argv =	NULL, \
+.path =	NULL, \
+.argc = 0, \
+,line_count = 0, \
+.err_num = 0, \
+.linecount_flag = 0, \
+.fname = NULL, \
+.env = NULL, \
+.history = NULL, \
+.alias = NULL, \
+.environ = NULL, \
+.env_changed = 0, \
+.status = 0, \
+.cmd_buf = NULL, \
+.cmd_buf_type = 0, \
+.readfd = 0, \
+.histcount = 0 \
+}
 
 
 /**
